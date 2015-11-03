@@ -28,7 +28,7 @@ public class Customer extends AbstractEntity {
 	private String lastname;
 
     @Embedded
-    @Column(unique = true)
+    @Column()
 	private EmailAddress emailAddress;
 
     @Column(name = "REG_DATE")
@@ -39,7 +39,7 @@ public class Customer extends AbstractEntity {
     @Type(type="org.jadira.usertype.dateandtime.joda.PersistentDateTime")
     private DateTime registrationDateTime;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany()
 	@JoinColumn(name = "CUSTOMER_ID")
 	private Set<Address> addresses;
 
@@ -51,8 +51,8 @@ public class Customer extends AbstractEntity {
 	private Set<DiscountProgram> discountPrograms;
 
     @Column(name = "AVATAR_FILE_URL")
-    @FileReference(baseDirectory = "D:\\workspace\\light-admin\\lightadmin-sandbox\\TMP_FILE")
-    @FileReference.Constraints(limit = 2)
+    @FileReference(baseDirectory = "/Users/Jian/IdeaProjects/light-admin/tmp")
+    @FileReference.Constraints(value = "jpg,png", limit = 10)
     private String avatar;
 
 	public Customer( String firstname, String lastname ) {

@@ -92,6 +92,10 @@ public class LightAdminRepositoryRestMvcConfiguration extends RepositoryRestMvcC
         return new DynamicDomainObjectMerger(repositories(), defaultConversionService(), globalAdministrationConfiguration());
     }
 
+    /**
+     * 創儲執行者工廠
+     * @return
+     */
     @Bean
     public RepositoryInvokerFactory repositoryInvokerFactory() {
         RepositoryInvokerFactory repositoryInvokerFactory = super.repositoryInvokerFactory();

@@ -56,14 +56,58 @@
         <param-name>spring.profiles.active</param-name>
         <param-value>test-env</param-value>
     </context-param>
+    
+    <context-param>
+        <param-name>webAppRootKey</param-name>
+        <param-value>webapp.root</param-value>
+    </context-param>
 
     <listener>
         <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
     </listener>
 
     <listener>
+        <listener-class>org.springframework.web.util.WebAppRootListener</listener-class>
+    </listener>
+
+    <listener>
         <listener-class>ch.qos.logback.classic.selector.servlet.ContextDetachingSCL</listener-class>
     </listener>
+
+    <!-- Druid 前台监控servlet -->
+    <servlet>
+        <servlet-name>DruidStatView</servlet-name>
+        <servlet-class>com.alibaba.druid.support.http.StatViewServlet</servlet-class>
+        <!--<init-param>-->
+            <!--<param-name>loginUsername</param-name>-->
+            <!--<param-value>admin</param-value>-->
+        <!--</init-param>-->
+        <!--<init-param>-->
+            <!--<param-name>loginPassword</param-name>-->
+            <!--<param-value>sinobest2015</param-value>-->
+        <!--</init-param>-->
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>DruidStatView</servlet-name>
+        <url-pattern>/druid/*</url-pattern>
+    </servlet-mapping>
+    <!-- Druid web 统计过滤器-->
+    <filter>
+        <filter-name>DruidWebStatFilter</filter-name>
+        <filter-class>com.alibaba.druid.support.http.WebStatFilter</filter-class>
+        <init-param>
+            <param-name>exclusions</param-name>
+            <param-value>*.js,*.gif,*.jpg,*.png,*.css,*.ico,/druid/*</param-value>
+        </init-param>
+        <init-param>
+            <param-name>principalSessionName</param-name>
+            <param-value>AuthorizedUserID</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>DruidWebStatFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
 
     <welcome-file-list>
         <welcome-file>admin</welcome-file>
