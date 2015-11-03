@@ -1,5 +1,5 @@
 CREATE TABLE customer (id BIGINT IDENTITY PRIMARY KEY, firstname VARCHAR(255), lastname VARCHAR(255), email VARCHAR(255), reg_date DATE, REG_DATE_TIME TIMESTAMP, AVATAR_FILE_URL VARCHAR(255));
-CREATE UNIQUE INDEX ix_customer_email ON CUSTOMER (email ASC);
+CREATE INDEX ix_customer_email ON CUSTOMER (email ASC);
 
 CREATE TABLE address (id BIGINT IDENTITY PRIMARY KEY, customer_id BIGINT CONSTRAINT address_customer_ref REFERENCES customer (id), street VARCHAR(255), city VARCHAR(255), country VARCHAR(255));
 
@@ -24,7 +24,7 @@ CREATE TABLE childtestentity (id BIGINT IDENTITY PRIMARY KEY, parent_id BIGINT C
 CREATE TABLE testproduct (id BIGINT IDENTITY PRIMARY KEY, name VARCHAR(255), price DECIMAL(8, 2), picture BLOB);
 
 CREATE TABLE testcustomer (id BIGINT IDENTITY PRIMARY KEY, firstname VARCHAR(255), lastname VARCHAR(255), email VARCHAR(255));
-CREATE UNIQUE INDEX ix_testcustomer_email ON TESTCUSTOMER (email ASC);
+CREATE INDEX ix_testcustomer_email ON TESTCUSTOMER (email ASC);
 
 CREATE TABLE testorders (id BIGINT IDENTITY PRIMARY KEY, name VARCHAR(255), customer_id BIGINT CONSTRAINT testorders_customer_ref REFERENCES testcustomer (id), duedate DATE);
 

@@ -51,8 +51,8 @@ public class Customer extends AbstractEntity {
 	private Set<DiscountProgram> discountPrograms;
 
     @Column(name = "AVATAR_FILE_URL")
-    @FileReference(baseDirectory = "/Users/max/Desktop/lightadmin-demo")
-    @FileReference.Constraints(value = "png", limit = 2)
+    @FileReference(baseDirectory = "D:\\workspace\\light-admin\\lightadmin-sandbox\\TMP_FILE")
+    @FileReference.Constraints(limit = 2)
     private String avatar;
 
 	public Customer( String firstname, String lastname ) {

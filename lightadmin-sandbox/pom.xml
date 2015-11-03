@@ -5,8 +5,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <artifactId>lightadmin-parent</artifactId>
         <groupId>org.lightadmin</groupId>
+        <artifactId>lightadmin-parent</artifactId>
         <version>1.2.0.BUILD-SNAPSHOT</version>
     </parent>
 
@@ -21,10 +21,10 @@
     </properties>
 
     <dependencies>
-
         <dependency>
             <groupId>org.lightadmin</groupId>
             <artifactId>lightadmin</artifactId>
+            <version>${project.parent.version}</version>
         </dependency>
         <dependency>
             <groupId>org.lightadmin</groupId>
@@ -88,6 +88,16 @@
         <dependency>
             <groupId>org.hsqldb</groupId>
             <artifactId>hsqldb</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>5.1.37</version>
+        </dependency>
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>druid</artifactId>
+            <version>1.0.16</version>
         </dependency>
 
         <dependency>
@@ -164,9 +174,25 @@
                 <configuration>
                     <port>${container.port}</port>
                     <uriEncoding>UTF-8</uriEncoding>
+                    <!-- spring profile  -->
+                    <systemProperties>
+                        <systemProperty>
+                            <name>spring.profiles.active</name>
+                            <value>development</value>
+                        </systemProperty>
+                    </systemProperties>
                 </configuration>
             </plugin>
         </plugins>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>**/*.*</include>
+                </includes>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
     </build>
 
     <repositories>
@@ -187,5 +213,74 @@
             </releases>
         </repository>
     </repositories>
+
+    <profiles>
+        <profile>
+            <id>development</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <db.name>lightadmin</db.name>
+                <connection.driver_class>com.mysql.jdbc.Driver</connection.driver_class>
+                <connection.admin.url>
+                    <![CDATA[jdbc:mysql://localhost:3306?autoReconnect=true&amp;useUnicode=true&amp;characterEncoding=utf-8]]>
+                </connection.admin.url>
+                <connection.url>
+                    <![CDATA[jdbc:mysql://localhost:3306/${db.name}?autoReconnect=true&amp;useUnicode=true&amp;characterEncoding=utf-8]]>
+                </connection.url>
+                <connection.username>root</connection.username>
+                <connection.password>wulihua</connection.password>
+                <jpa.showSql>false</jpa.showSql>
+                <jpa.generateDdl>true</jpa.generateDdl>
+                <jpa.database>MYSQL</jpa.database>
+                <jpa.databasePlatform>org.hibernate.dialect.MySQL5InnoDBDialect</jpa.databasePlatform>
+
+            </properties>
+        </profile>
+        <profile>
+            <!-- integration test -->
+            <id>it</id>
+            <properties>
+                <db.name>lightadmin</db.name>
+                <connection.driver_class>com.mysql.jdbc.Driver</connection.driver_class>
+                <connection.admin.url>
+                    <![CDATA[jdbc:mysql://localhost:3306?autoReconnect=true&amp;useUnicode=true&amp;characterEncoding=utf-8]]>
+                </connection.admin.url>
+                <connection.url>
+                    <![CDATA[jdbc:mysql://localhost:3306/${db.name}?autoReconnect=true&amp;useUnicode=true&amp;characterEncoding=utf-8]]>
+                </connection.url>
+                <connection.username>root</connection.username>
+                <connection.password>wulihua</connection.password>
+                <jpa.showSql>false</jpa.showSql>
+                <jpa.generateDdl>false</jpa.generateDdl>
+                <jpa.database>MYSQL</jpa.database>
+                <jpa.databasePlatform>org.hibernate.dialect.MySQL5InnoDBDialect</jpa.databasePlatform>
+
+            </properties>
+        </profile>
+
+        <profile>
+            <!--正式环境-->
+            <id>production</id>
+            <properties>
+                <db.name>lightadmin</db.name>
+                <connection.driver_class>com.mysql.jdbc.Driver</connection.driver_class>
+                <connection.admin.url>
+                    <![CDATA[jdbc:mysql://localhost:3306?autoReconnect=true&amp;useUnicode=true&amp;characterEncoding=utf-8]]>
+                </connection.admin.url>
+                <connection.url>
+                    <![CDATA[jdbc:mysql://localhost:3306/${db.name}?autoReconnect=true&amp;useUnicode=true&amp;characterEncoding=utf-8]]>
+                </connection.url>
+                <connection.username>root</connection.username>
+                <connection.password/>
+                <jpa.showSql>false</jpa.showSql>
+                <jpa.generateDdl>false</jpa.generateDdl>
+                <jpa.database>MYSQL</jpa.database>
+                <jpa.databasePlatform>org.hibernate.dialect.MySQL5InnoDBDialect</jpa.databasePlatform>
+
+            </properties>
+        </profile>
+    </profiles>
 
 </project>

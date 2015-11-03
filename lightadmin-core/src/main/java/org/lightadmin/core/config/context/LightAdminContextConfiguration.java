@@ -56,11 +56,11 @@ import static org.springframework.web.servlet.DispatcherServlet.VIEW_RESOLVER_BE
 
 @Configuration
 @Import({
-        LightAdminDataConfiguration.class,
+        LightAdminDataConfiguration.class,//数据源配置
         LightAdminDomainConfiguration.class,
-        LightAdminRemoteConfiguration.class,
-        LightAdminRepositoryRestMvcConfiguration.class,
-        LightAdminViewConfiguration.class
+        LightAdminRemoteConfiguration.class,//远程服务配置？
+        LightAdminRepositoryRestMvcConfiguration.class,//RepositoryRestMvc配置
+        LightAdminViewConfiguration.class//Tiles views配置
 })
 @EnableWebMvc
 public class LightAdminContextConfiguration extends WebMvcConfigurerAdapter {
@@ -72,30 +72,56 @@ public class LightAdminContextConfiguration extends WebMvcConfigurerAdapter {
         registry.addResourceHandler("/images/**").addResourceLocations("classpath:/META-INF/resources/images/", LIGHT_ADMIN_CUSTOM_RESOURCE_CLASSPATH_LOCATION + "/images/").setCachePeriod(31556926);
     }
 
+    /**
+     * Servlet 全局配置
+     * @param servletContext
+     * @return
+     */
     @Bean
     @Autowired
     public LightAdminConfiguration lightAdminConfiguration(ServletContext servletContext) {
         return new StandardLightAdminConfiguration(servletContext);
     }
 
+    /**
+     * Servlet上下文资源加载器
+     * @param servletContext
+     * @return
+     */
     @Bean
     @Autowired
     public ServletContextResourceLoader servletContextResourceLoader(ServletContext servletContext) {
         return new ServletContextResourceLoader(servletContext);
     }
 
+    /**
+     * 附件资源策略
+     * @param globalAdministrationConfiguration
+     * @param lightAdminConfiguration
+     * @return
+     */
     @Bean
     @Autowired
     public FileResourceStorage fileResourceStorage(GlobalAdministrationConfiguration globalAdministrationConfiguration, LightAdminConfiguration lightAdminConfiguration) {
         return new LightAdminFileResourceStorage(globalAdministrationConfiguration, lightAdminConfiguration);
     }
 
+    /**
+     * 附件资源加载器
+     * @param globalAdministrationConfiguration
+     * @param fileResourceStorage
+     * @return
+     */
     @Bean
     @Autowired
     public FileResourceLoader fileResourceLoader(GlobalAdministrationConfiguration globalAdministrationConfiguration, FileResourceStorage fileResourceStorage) {
         return new FileResourceLoader(globalAdministrationConfiguration, fileResourceStorage);
     }
 
+    /**
+     * 公共多附件解决者
+     * @return
+     */
     @Bean
     public CommonsMultipartResolver multipartResolver() {
         return new CommonsMultipartResolver();
@@ -120,6 +146,10 @@ public class LightAdminContextConfiguration extends WebMvcConfigurerAdapter {
         return validator();
     }
 
+    /**
+     * 本地化的校验工厂
+     * @return
+     */
     @Bean
     public LocalValidatorFactoryBean validator() {
         LocalValidatorFactoryBean validator = new LocalValidatorFactoryBean();
@@ -128,6 +158,10 @@ public class LightAdminContextConfiguration extends WebMvcConfigurerAdapter {
         return validator;
     }
 
+    /**
+     * 国际化资源
+     * @return
+     */
     @Bean
     public MessageSource messageSource() {
         ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
@@ -138,11 +172,19 @@ public class LightAdminContextConfiguration extends WebMvcConfigurerAdapter {
         return messageSource;
     }
 
+    /**
+     * 应用级的controller
+     * @return
+     */
     @Bean
     public ApplicationController applicationController() {
         return new ApplicationController();
     }
 
+    /**
+     * 视图解析器，使用Tiles
+     * @return
+     */
     @Bean(name = VIEW_RESOLVER_BEAN_NAME)
     public ViewResolver viewResolver() {
         return new TilesViewResolver() {
@@ -153,6 +195,10 @@ public class LightAdminContextConfiguration extends WebMvcConfigurerAdapter {
         };
     }
 
+    /**
+     * Tiles配置
+     * @return
+     */
     @Bean
     public TilesConfigurer tilesConfigurer() {
         final String[] definitions = {"classpath*:META-INF/tiles/definitions.xml"};

@@ -16,10 +16,10 @@
 package org.lightadmin.core.view.tags;
 
 import org.lightadmin.core.config.LightAdminConfiguration;
+import org.springframework.beans.PropertyAccessorFactory;
 
 import javax.servlet.jsp.JspException;
 
-import static org.springframework.beans.PropertyAccessorFactory.forDirectFieldAccess;
 import static org.springframework.web.servlet.support.ServletUriComponentsBuilder.fromCurrentContextPath;
 
 public class LightAdminUrlTag extends org.springframework.web.servlet.tags.UrlTag {
@@ -43,7 +43,7 @@ public class LightAdminUrlTag extends org.springframework.web.servlet.tags.UrlTa
     }
 
     private String getValue() {
-        return (String) forDirectFieldAccess(this).getPropertyValue("value");
+        return (String) PropertyAccessorFactory.forDirectFieldAccess(this).getPropertyValue("value");
     }
 
     private String applicationUrl(String value) {

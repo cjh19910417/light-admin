@@ -22,7 +22,7 @@
 
     <link rel="stylesheet" type="text/css" href="<light:url value="/styles/main.css"/>">
     <link rel="stylesheet" type="text/css" href="<light:url value="/styles/lightadmin.css"/>">
-    <link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Cuprum">
+    <%--<link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Cuprum">--%>
 
     <tiles:insertAttribute name="scripts-include"/>
 </head>

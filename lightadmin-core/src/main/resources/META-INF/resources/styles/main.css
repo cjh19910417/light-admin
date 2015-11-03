@@ -169,7 +169,7 @@ div.tagsinput div {
 /* ==========  Typo  ========== */
 
 h1, h2, h3, h4, h5, h6, ul.tabs li a, .leftNav ul li a, .stats ul li span, .userLink, .errorPage p, .ui-dialog .ui-dialog-title {
-    font-family: 'Cuprum', sans-serif;
+    /*font-family: '宋体', sans-serif;*/
     font-weight: normal;
 }
 
