@@ -63,6 +63,10 @@ public class GlobalAdministrationConfiguration {
         return domainTypes;
     }
 
+    /**
+     * 获取所有Domain的类型
+     * @return
+     */
     public Class<?>[] getAllDomainTypesAsArray() {
         Set<Class<?>> allDomainTypes = getAllDomainTypes();
         return allDomainTypes.toArray(new Class<?>[allDomainTypes.size()]);

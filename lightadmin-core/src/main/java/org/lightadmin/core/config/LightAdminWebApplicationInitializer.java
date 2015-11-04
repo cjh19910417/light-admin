@@ -49,8 +49,11 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.lightadmin.core.util.LightAdminConfigurationUtils.*;
 import static org.springframework.core.Ordered.LOWEST_PRECEDENCE;
 
+/**
+ * web.xml3.0版本配置入口
+ */
 @SuppressWarnings("unused")
-@Order(LOWEST_PRECEDENCE)
+@Order(LOWEST_PRECEDENCE)//最后加载的配置项
 public class LightAdminWebApplicationInitializer implements WebApplicationInitializer {
 
     public static String SERVLET_CONTEXT_ATTRIBUTE_NAME = FrameworkServlet.SERVLET_CONTEXT_PREFIX + LightAdminConfigurationUtils.LIGHT_ADMIN_DISPATCHER_NAME;
@@ -62,17 +65,17 @@ public class LightAdminWebApplicationInitializer implements WebApplicationInitia
     @Override
     public void onStartup(final ServletContext servletContext) throws ServletException {
         if (lightAdminConfigurationNotEnabled(servletContext)) {
-            servletContext.log("LightAdmin Web Administration Module is disabled by default. Skipping.");
+            servletContext.log("LightAdmin Web Administration 模块未开启。跳过。");
             return;
         }
 
         if (notValidBaseUrl(lightAdminBaseUrl(servletContext))) {
-            servletContext.log("LightAdmin Web Administration Module's 'baseUrl' property must match " + BASE_URL_PATTERN.pattern() + " pattern. Skipping.");
+            servletContext.log("LightAdmin Web Administration 模块的'baseUrl'属性必须和" + BASE_URL_PATTERN.pattern() + "格式匹配.");
             return;
         }
 
         if (notValidFileStorageDirectoryDefined(servletContext)) {
-            servletContext.log("LightAdmin Web Administration Module's global file storage directory doesn't exist or not a directory.");
+            servletContext.log("LightAdmin Web Administration 模块的全局附件保存目录不存在！");
             return;
         }
 
@@ -115,6 +118,11 @@ public class LightAdminWebApplicationInitializer implements WebApplicationInitia
         lightAdminDispatcherRedirectorRegistration.addMapping(lightAdminBaseUrl(servletContext));
     }
 
+    /**
+     * ${webcontext}/dynamic/custom?resource=/WEB-INF/lightadmin/sidebars/sidebar.jsp
+     * 注册/WEB-INF/lightadmin/下的.jsp自定义资源
+     * @param servletContext
+     */
     private void registerCustomResourceServlet(final ServletContext servletContext) {
         final ResourceServlet resourceServlet = new ResourceServlet();
         resourceServlet.setAllowedResources(LIGHT_ADMIN_CUSTOM_RESOURCE_FRAGMENT_LOCATION);
@@ -126,6 +134,10 @@ public class LightAdminWebApplicationInitializer implements WebApplicationInitia
         customResourceServletRegistration.addMapping(resourceServletMapping(servletContext, LIGHT_ADMIN_CUSTOM_FRAGMENT_SERVLET_URL));
     }
 
+    /**
+     * logo
+     * @param servletContext
+     */
     private void registerLogoResourceServlet(final ServletContext servletContext) {
         ServletRegistration.Dynamic customResourceServletRegistration = servletContext.addServlet(LIGHT_ADMIN_LOGO_RESOURCE_SERVLET_NAME, logoResourceServlet(servletContext));
         customResourceServletRegistration.setLoadOnStartup(3);
@@ -176,11 +188,19 @@ public class LightAdminWebApplicationInitializer implements WebApplicationInitia
         servletContext.addFilter("lightAdminGzipFilter", gzipFilter).addMappingForUrlPatterns(null, false, urlMappings);
     }
 
+    /**
+     * 创建spring mvc上下文
+     * @param servletContext
+     * @return
+     */
     private AnnotationConfigWebApplicationContext lightAdminApplicationContext(final ServletContext servletContext) {
         AnnotationConfigWebApplicationContext webApplicationContext = new AnnotationConfigWebApplicationContext();
 
+        //获取Adminitration Configuration配置的包路径表达式
         String basePackage = configurationsBasePackage(servletContext);
+        //注册配置类
         webApplicationContext.register(configurations(servletContext));
+        //添加beanfactory后置处理
         webApplicationContext.addBeanFactoryPostProcessor(new LightAdminBeanDefinitionRegistryPostProcessor(basePackage, servletContext));
 
         webApplicationContext.setDisplayName("LightAdmin WebApplicationContext");
@@ -189,7 +209,7 @@ public class LightAdminWebApplicationInitializer implements WebApplicationInitia
     }
 
     private Class[] configurations(final ServletContext servletContext) {
-        if (lightAdminSecurityEnabled(servletContext)) {
+        if (lightAdminSecurityEnabled(servletContext)) {//是否开启Spring Security 安全认证模块
             return new Class[]{LightAdminContextConfiguration.class, LightAdminSecurityConfiguration.class};
         }
         return new Class[]{LightAdminContextConfiguration.class};

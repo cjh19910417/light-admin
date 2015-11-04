@@ -110,12 +110,21 @@ public class LightAdminRepositoryRestMvcConfiguration extends RepositoryRestMvcC
         return new FileManipulationRepositoryEventListener(configuration, fileResourceStorage);
     }
 
+    /**
+     * Spring Data REST设置
+     * @param config
+     */
     @Override
     protected void configureRepositoryRestConfiguration(RepositoryRestConfiguration config) {
+        //设置默认每页查询10条
         config.setDefaultPageSize(10);
+        //设置根Uri
         config.setBaseUri(lightAdminConfiguration().getApplicationRestBaseUrl());
+        //只有这些实体类才使用SDR
         config.exposeIdsFor(globalAdministrationConfiguration().getAllDomainTypesAsArray());
+        //成功创建新实体后，返回实体本事
         config.setReturnBodyOnCreate(true);
+        //成功更新实体后，返回实体本事
         config.setReturnBodyOnUpdate(true);
     }
 

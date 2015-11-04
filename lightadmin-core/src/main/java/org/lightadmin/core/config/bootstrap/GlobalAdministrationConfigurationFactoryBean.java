@@ -45,6 +45,9 @@ import static com.google.common.collect.Sets.newLinkedHashSet;
 import static java.lang.String.format;
 import static org.apache.commons.lang3.ArrayUtils.toArray;
 
+/**
+ * Administration全局配置工厂类
+ */
 @SuppressWarnings("unused")
 public class GlobalAdministrationConfigurationFactoryBean extends AbstractFactoryBean<GlobalAdministrationConfiguration> implements InitializingBean {
 
@@ -92,15 +95,16 @@ public class GlobalAdministrationConfigurationFactoryBean extends AbstractFactor
     @Override
     protected GlobalAdministrationConfiguration createInstance() throws Exception {
         GlobalAdministrationConfiguration globalAdministrationConfiguration = new GlobalAdministrationConfiguration();
-
+        //遍历处理所有的配置单元
         for (ConfigurationUnits configurationUnits : domainTypeConfigurationUnits) {
+            //是否为持久化实体
             if (nonPersistentEntityType(configurationUnits.getDomainType())) {
                 problemReporter.handle(new DomainConfigurationProblem(configurationUnits, format("Administration of non-persistent type %s is not supported.", configurationUnits.getDomainType().getSimpleName())));
                 continue;
             }
-
+            //预处理
             configurationUnits = preprocessConfigurationUnits(configurationUnits);
-
+            //校验配置规则合法性
             configurationUnitsValidator.validate(configurationUnits, problemReporter);
 
             DomainTypeAdministrationConfiguration domainTypeAdministrationConfiguration = domainTypeAdministrationConfigurationFactory.createAdministrationConfiguration(configurationUnits);

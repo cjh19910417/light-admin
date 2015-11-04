@@ -28,7 +28,7 @@ import org.springframework.util.ClassUtils;
 
 import java.rmi.RemoteException;
 
-@Profile("test-env")
+@Profile("development")
 @Configuration
 public class LightAdminRemoteConfiguration {
 
