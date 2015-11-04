@@ -22,10 +22,12 @@ import org.lightadmin.core.config.context.LightAdminSecurityConfiguration;
 import org.lightadmin.core.util.LightAdminConfigurationUtils;
 import org.lightadmin.core.view.TilesContainerEnrichmentFilter;
 import org.lightadmin.core.web.DispatcherRedirectorServlet;
+import org.springframework.core.Conventions;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.util.Assert;
 import org.springframework.web.WebApplicationInitializer;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.context.support.ServletContextResourceLoader;
@@ -36,11 +38,11 @@ import org.springframework.web.servlet.DispatcherServlet;
 import org.springframework.web.servlet.FrameworkServlet;
 import org.springframework.web.servlet.ResourceServlet;
 
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRegistration;
+import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
+import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.regex.Pattern;
 
 import static org.apache.commons.io.FileUtils.getFile;
@@ -55,6 +57,7 @@ import static org.springframework.core.Ordered.LOWEST_PRECEDENCE;
 @SuppressWarnings("unused")
 @Order(LOWEST_PRECEDENCE)//最后加载的配置项
 public class LightAdminWebApplicationInitializer implements WebApplicationInitializer {
+    public static final String DEFAULT_SESSION_FILTER_NAME = "springSessionRepositoryFilter";
 
     public static String SERVLET_CONTEXT_ATTRIBUTE_NAME = FrameworkServlet.SERVLET_CONTEXT_PREFIX + LightAdminConfigurationUtils.LIGHT_ADMIN_DISPATCHER_NAME;
 
@@ -97,6 +100,9 @@ public class LightAdminWebApplicationInitializer implements WebApplicationInitia
         registerCharsetFilter(servletContext);
 
         registerTilesDecorationFilter(servletContext);
+
+        registerSessionRepositoryFilter(servletContext);
+
     }
 
     private void registerLightAdminDispatcher(final ServletContext servletContext) {
@@ -210,9 +216,9 @@ public class LightAdminWebApplicationInitializer implements WebApplicationInitia
 
     private Class[] configurations(final ServletContext servletContext) {
         if (lightAdminSecurityEnabled(servletContext)) {//是否开启Spring Security 安全认证模块
-            return new Class[]{LightAdminContextConfiguration.class, LightAdminSecurityConfiguration.class};
+            return new Class[]{LightAdminContextConfiguration.class, RedisHttpSessionConfiguration.class, LightAdminSecurityConfiguration.class};
         }
-        return new Class[]{LightAdminContextConfiguration.class};
+        return new Class[]{LightAdminContextConfiguration.class, RedisHttpSessionConfiguration.class};
     }
 
     private DelegatingFilterProxy springSecurityFilterChain() {
@@ -313,5 +319,51 @@ public class LightAdminWebApplicationInitializer implements WebApplicationInitia
                 return location;
             }
         };
+    }
+
+    /**
+     * Registers the springSessionRepositoryFilter
+     * @param servletContext the {@link ServletContext}
+     */
+    private void registerSessionRepositoryFilter(ServletContext servletContext) {
+        String filterName = DEFAULT_SESSION_FILTER_NAME;
+        DelegatingFilterProxy springSessionRepositoryFilter = new DelegatingFilterProxy(filterName);
+        springSessionRepositoryFilter.setContextAttribute(SERVLET_CONTEXT_ATTRIBUTE_NAME);
+        registerFilter(servletContext, true, filterName, springSessionRepositoryFilter);
+    }
+
+    private void registerFilters(ServletContext servletContext, boolean insertBeforeOtherFilters, Filter... filters) {
+        Assert.notEmpty(filters, "filters cannot be null or empty");
+
+        for(Filter filter : filters) {
+            if(filter == null) {
+                throw new IllegalArgumentException("filters cannot contain null values. Got " + Arrays.asList(filters));
+            }
+            String filterName = Conventions.getVariableName(filter);
+            registerFilter(servletContext, insertBeforeOtherFilters, filterName, filter);
+        }
+    }
+
+    private final void registerFilter(ServletContext servletContext, boolean insertBeforeOtherFilters, String filterName, Filter filter) {
+        FilterRegistration.Dynamic registration = servletContext.addFilter(filterName, filter);
+        if(registration == null) {
+            throw new IllegalStateException("Duplicate Filter registration for '" + filterName +"'. Check to ensure the Filter is only configured once.");
+        }
+        registration.setAsyncSupported(isAsyncSessionSupported());
+        EnumSet<DispatcherType> dispatcherTypes = getSessionDispatcherTypes();
+        registration.addMappingForUrlPatterns(dispatcherTypes, !insertBeforeOtherFilters, "/*");
+    }
+
+
+    protected String getDispatcherWebApplicationContextSuffix() {
+        return null;
+    }
+
+    protected EnumSet<DispatcherType> getSessionDispatcherTypes() {
+        return EnumSet.of(DispatcherType.REQUEST, DispatcherType.ERROR, DispatcherType.ASYNC);
+    }
+
+    protected boolean isAsyncSessionSupported() {
+        return true;
     }
 }
