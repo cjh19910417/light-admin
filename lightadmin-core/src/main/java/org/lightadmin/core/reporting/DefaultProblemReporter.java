@@ -26,6 +26,9 @@ import static com.google.common.collect.Lists.newArrayList;
 import static org.lightadmin.core.reporting.Problem.ProblemLevel.ERROR;
 import static org.lightadmin.core.reporting.Problem.ProblemLevel.WARNING;
 
+/**
+ * 默认的配置问题处理者
+ */
 public class DefaultProblemReporter implements ProblemReporter {
 
     public static final ProblemReporter INSTANCE = new DefaultProblemReporter();

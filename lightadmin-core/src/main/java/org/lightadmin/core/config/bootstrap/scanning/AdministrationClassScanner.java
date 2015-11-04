@@ -20,6 +20,9 @@ import org.lightadmin.api.config.annotation.Administration;
 import org.springframework.core.type.filter.AnnotationTypeFilter;
 import org.springframework.core.type.filter.AssignableTypeFilter;
 
+/**
+ * 扫描获取Adminitration配置类
+ */
 public class AdministrationClassScanner extends TypeFilterClassScanner {
 
     public AdministrationClassScanner() {

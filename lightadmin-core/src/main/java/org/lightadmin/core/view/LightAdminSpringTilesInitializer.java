@@ -45,6 +45,9 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * Tiles配置初始化
+ */
 public class LightAdminSpringTilesInitializer extends AbstractTilesInitializer {
 
     private static final boolean tilesElPresent = ClassUtils.isPresent("org.apache.tiles.el.ELAttributeEvaluator", LightAdminSpringTilesInitializer.class.getClassLoader());

@@ -72,12 +72,18 @@ import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newLinkedHashMap;
 import static java.util.Arrays.asList;
 
+/**
+ * Spring Scurity配置
+ */
 @Configuration
 public class LightAdminSecurityConfiguration {
 
     private static final String REMEMBER_ME_DIGEST_KEY = "LightAdmin";
     private static final String ROLE_ADMIN = "ROLE_ADMIN";
 
+    /**
+     * 公共类资源url pattern，无需认证
+     */
     private static final String[] PUBLIC_RESOURCES = {
             "/images/**", "/scripts/**", "/styles/**",
             "/rest/**/file",

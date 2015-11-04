@@ -21,6 +21,10 @@ import org.springframework.web.context.support.AnnotationConfigWebApplicationCon
 
 public class LightAdminContextInitializer implements ApplicationContextInitializer<AnnotationConfigWebApplicationContext> {
 
+    /**
+     * lightadmin上下文配置的入口
+     * @param applicationContext
+     */
     @Override
     public void initialize(AnnotationConfigWebApplicationContext applicationContext) {
         applicationContext.register(LightAdminContextConfiguration.class);

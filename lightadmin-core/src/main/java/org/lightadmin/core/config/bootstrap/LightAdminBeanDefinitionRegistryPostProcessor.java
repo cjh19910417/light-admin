@@ -191,6 +191,10 @@ public class LightAdminBeanDefinitionRegistryPostProcessor implements BeanDefini
         return classFactory.createDynamicRepositoryClass(domainType, idType);
     }
 
+    /**
+     * 扫描配置类
+     * @return
+     */
     private Set<Class> scanPackageForAdministrationClasses() {
         final Set<Class> administrationConfigs = newLinkedHashSet();
         for (String configurationsBasePackage : configurationsBasePackages()) {

@@ -39,7 +39,7 @@
 
 	<context-param>
 		<param-name>spring.profiles.active</param-name>
-		<param-value>test-env</param-value>
+		<param-value>development</param-value>
 	</context-param>
 
 	<listener>

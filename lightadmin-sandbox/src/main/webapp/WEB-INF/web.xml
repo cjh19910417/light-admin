@@ -3,9 +3,9 @@
          xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
          version="3.0" metadata-complete="false">
 
-    <display-name>LightAdmin DEMO</display-name>
+    <display-name>LightAdmin Sandbox</display-name>
 
-    <description>LightAdmin - Administration framework for Java web applications. [DEMO]</description>
+    <description>LightAdmin - Administration framework for Java web applications.</description>
 
     <context-param>
         <param-name>light:configurer:base-url</param-name>
@@ -54,7 +54,7 @@
 
     <context-param>
         <param-name>spring.profiles.active</param-name>
-        <param-value>test-env</param-value>
+        <param-value>development</param-value>
     </context-param>
     
     <context-param>
@@ -73,24 +73,6 @@
     <listener>
         <listener-class>ch.qos.logback.classic.selector.servlet.ContextDetachingSCL</listener-class>
     </listener>
-
-    <!-- Druid 前台监控servlet -->
-    <servlet>
-        <servlet-name>DruidStatView</servlet-name>
-        <servlet-class>com.alibaba.druid.support.http.StatViewServlet</servlet-class>
-        <!--<init-param>-->
-            <!--<param-name>loginUsername</param-name>-->
-            <!--<param-value>admin</param-value>-->
-        <!--</init-param>-->
-        <!--<init-param>-->
-            <!--<param-name>loginPassword</param-name>-->
-            <!--<param-value>sinobest2015</param-value>-->
-        <!--</init-param>-->
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>DruidStatView</servlet-name>
-        <url-pattern>/druid/*</url-pattern>
-    </servlet-mapping>
     <!-- Druid web 统计过滤器-->
     <filter>
         <filter-name>DruidWebStatFilter</filter-name>
@@ -108,7 +90,23 @@
         <filter-name>DruidWebStatFilter</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
-
+    <!-- Druid 前台监控servlet -->
+    <servlet>
+        <servlet-name>DruidStatView</servlet-name>
+        <servlet-class>com.alibaba.druid.support.http.StatViewServlet</servlet-class>
+        <!--<init-param>
+            <param-name>loginUsername</param-name>
+            <param-value>admin</param-value>
+        </init-param>
+        <init-param>
+            <param-name>loginPassword</param-name>
+            <param-value>sinobest2015</param-value>
+        </init-param>-->
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>DruidStatView</servlet-name>
+        <url-pattern>/druid/*</url-pattern>
+    </servlet-mapping>
     <welcome-file-list>
         <welcome-file>admin</welcome-file>
     </welcome-file-list>

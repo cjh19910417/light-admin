@@ -29,6 +29,9 @@ import java.io.IOException;
 
 import static org.lightadmin.core.view.LightAdminSpringTilesInitializer.LIGHT_ADMIN_TILES_CONTAINER_ATTRIBUTE;
 
+/**
+ * Tiles容器增强过滤器
+ */
 public class TilesContainerEnrichmentFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(final HttpServletRequest request, final HttpServletResponse response, final FilterChain filterChain) throws ServletException, IOException {
