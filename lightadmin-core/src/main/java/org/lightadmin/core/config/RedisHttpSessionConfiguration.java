@@ -5,6 +5,8 @@ import org.springframework.context.annotation.Configuration;
 
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
+import org.springframework.session.web.http.HeaderHttpSessionStrategy;
+import org.springframework.session.web.http.HttpSessionStrategy;
 
 /**
  * Runs an embedded Redis instance. This is only necessary since we do not want
@@ -23,5 +25,13 @@ public class RedisHttpSessionConfiguration {
         jedisConnectionFactory.setHostName("127.0.0.1");
         return jedisConnectionFactory;
     }
-
+    /**
+     * HttpSessionStrategy
+     *
+     * @return
+     */
+    /*@Bean
+    public HttpSessionStrategy httpSessionStrategy() {
+        return new HeaderHttpSessionStrategy();
+    }*/
 }

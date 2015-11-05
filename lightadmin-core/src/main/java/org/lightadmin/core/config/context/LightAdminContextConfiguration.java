@@ -54,6 +54,9 @@ import java.util.List;
 import static org.lightadmin.core.util.LightAdminConfigurationUtils.LIGHT_ADMIN_CUSTOM_RESOURCE_CLASSPATH_LOCATION;
 import static org.springframework.web.servlet.DispatcherServlet.VIEW_RESOLVER_BEAN_NAME;
 
+/**
+ * Spring MVC 配置
+ */
 @Configuration
 @Import({
         LightAdminDataConfiguration.class,//数据源配置

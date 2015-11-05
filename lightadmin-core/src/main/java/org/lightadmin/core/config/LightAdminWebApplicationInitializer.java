@@ -41,8 +41,6 @@ import org.springframework.web.servlet.ResourceServlet;
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
-import java.util.Arrays;
-import java.util.EnumSet;
 import java.util.regex.Pattern;
 
 import static org.apache.commons.io.FileUtils.getFile;
@@ -52,12 +50,11 @@ import static org.lightadmin.core.util.LightAdminConfigurationUtils.*;
 import static org.springframework.core.Ordered.LOWEST_PRECEDENCE;
 
 /**
- * web.xml3.0版本配置入口
+ * ServletContext初始化最后一环节配置
  */
 @SuppressWarnings("unused")
 @Order(LOWEST_PRECEDENCE)//最后加载的配置项
 public class LightAdminWebApplicationInitializer implements WebApplicationInitializer {
-    public static final String DEFAULT_SESSION_FILTER_NAME = "springSessionRepositoryFilter";
 
     public static String SERVLET_CONTEXT_ATTRIBUTE_NAME = FrameworkServlet.SERVLET_CONTEXT_PREFIX + LightAdminConfigurationUtils.LIGHT_ADMIN_DISPATCHER_NAME;
 
@@ -81,31 +78,34 @@ public class LightAdminWebApplicationInitializer implements WebApplicationInitia
             servletContext.log("LightAdmin Web Administration 模块的全局附件保存目录不存在！");
             return;
         }
-
+        //1.注册自定义的资源servlet
         registerCustomResourceServlet(servletContext);
+        //2.注册Logo图标的servlet
         registerLogoResourceServlet(servletContext);
-
+        //3.注册Springmvc依赖的DispatcherServlet
         registerLightAdminDispatcher(servletContext);
 
+        //4.注册/的servlet可以重定向到contextpath下的更路径
         if (notRootUrl(lightAdminBaseUrl(servletContext))) {
             registerLightAdminDispatcherRedirector(servletContext);
         }
-
+        //5.hiddenMethod Filter
         registerHiddenHttpMethodFilter(servletContext);
 
         if (lightAdminSecurityEnabled(servletContext)) {
             registerSpringSecurityFilter(servletContext);
         }
-
+        //6.字符编码过滤器
         registerCharsetFilter(servletContext);
-
+        //7.Tiles view过滤器
         registerTilesDecorationFilter(servletContext);
 
-        registerSessionRepositoryFilter(servletContext);
+        //registerSessionRepositoryFilter(servletContext);
 
     }
 
     private void registerLightAdminDispatcher(final ServletContext servletContext) {
+        //创建属于Spring MVC的applnicationContext
         final AnnotationConfigWebApplicationContext webApplicationContext = lightAdminApplicationContext(servletContext);
 
         final DispatcherServlet lightAdminDispatcher = new DispatcherServlet(webApplicationContext);
@@ -324,12 +324,12 @@ public class LightAdminWebApplicationInitializer implements WebApplicationInitia
     /**
      * Registers the springSessionRepositoryFilter
      * @param servletContext the {@link ServletContext}
-     */
+     *//*
     private void registerSessionRepositoryFilter(ServletContext servletContext) {
         String filterName = DEFAULT_SESSION_FILTER_NAME;
-        DelegatingFilterProxy springSessionRepositoryFilter = new DelegatingFilterProxy(filterName);
-        springSessionRepositoryFilter.setContextAttribute(SERVLET_CONTEXT_ATTRIBUTE_NAME);
-        registerFilter(servletContext, true, filterName, springSessionRepositoryFilter);
+        *//*DelegatingFilterProxy springSessionRepositoryFilter = new DelegatingFilterProxy(filterName);
+        springSessionRepositoryFilter.setContextAttribute(SERVLET_CONTEXT_ATTRIBUTE_NAME);*//*
+        registerFilter(servletContext, true, filterName, springSecurityFilterChain());
     }
 
     private void registerFilters(ServletContext servletContext, boolean insertBeforeOtherFilters, Filter... filters) {
@@ -351,7 +351,7 @@ public class LightAdminWebApplicationInitializer implements WebApplicationInitia
         }
         registration.setAsyncSupported(isAsyncSessionSupported());
         EnumSet<DispatcherType> dispatcherTypes = getSessionDispatcherTypes();
-        registration.addMappingForUrlPatterns(dispatcherTypes, !insertBeforeOtherFilters, "/*");
+        registration.addMappingForUrlPatterns(dispatcherTypes, !insertBeforeOtherFilters, "*//*");
     }
 
 
@@ -365,5 +365,5 @@ public class LightAdminWebApplicationInitializer implements WebApplicationInitia
 
     protected boolean isAsyncSessionSupported() {
         return true;
-    }
+    }*/
 }
