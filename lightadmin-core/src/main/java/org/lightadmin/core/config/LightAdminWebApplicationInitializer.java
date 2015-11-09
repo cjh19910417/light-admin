@@ -22,12 +22,10 @@ import org.lightadmin.core.config.context.LightAdminSecurityConfiguration;
 import org.lightadmin.core.util.LightAdminConfigurationUtils;
 import org.lightadmin.core.view.TilesContainerEnrichmentFilter;
 import org.lightadmin.core.web.DispatcherRedirectorServlet;
-import org.springframework.core.Conventions;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
-import org.springframework.util.Assert;
 import org.springframework.web.WebApplicationInitializer;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.context.support.ServletContextResourceLoader;
@@ -216,9 +214,9 @@ public class LightAdminWebApplicationInitializer implements WebApplicationInitia
 
     private Class[] configurations(final ServletContext servletContext) {
         if (lightAdminSecurityEnabled(servletContext)) {//是否开启Spring Security 安全认证模块
-            return new Class[]{LightAdminContextConfiguration.class, RedisHttpSessionConfiguration.class, LightAdminSecurityConfiguration.class};
+            return new Class[]{LightAdminContextConfiguration.class, RedisConfiguration.class, LightAdminSecurityConfiguration.class};
         }
-        return new Class[]{LightAdminContextConfiguration.class, RedisHttpSessionConfiguration.class};
+        return new Class[]{LightAdminContextConfiguration.class, RedisConfiguration.class};
     }
 
     private DelegatingFilterProxy springSecurityFilterChain() {

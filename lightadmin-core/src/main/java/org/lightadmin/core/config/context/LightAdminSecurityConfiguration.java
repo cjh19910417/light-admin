@@ -16,12 +16,20 @@
 package org.lightadmin.core.config.context;
 
 import org.lightadmin.core.config.LightAdminConfiguration;
+import org.lightadmin.core.config.security.RdbmsUserDetailsServiceImpl;
 import org.lightadmin.core.web.security.LightAdminRequestCache;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.config.PreferencesPlaceholderConfigurer;
+import org.springframework.beans.factory.config.PropertiesFactoryBean;
+import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
+import org.springframework.core.env.PropertyResolver;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
 import org.springframework.security.access.AccessDecisionVoter;
@@ -35,11 +43,13 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.RememberMeAuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.authentication.encoding.Md5PasswordEncoder;
 import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.servlet.configuration.EnableWebMvcSecurity;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.web.DefaultSecurityFilterChain;
 import org.springframework.security.web.FilterChainProxy;
 import org.springframework.security.web.SecurityFilterChain;
@@ -67,6 +77,7 @@ import org.springframework.security.web.util.matcher.AnyRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
 import javax.servlet.Filter;
+import javax.sql.DataSource;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -83,6 +94,7 @@ import static java.util.Arrays.asList;
 @Configuration
 @EnableWebSecurity
 @EnableWebMvcSecurity
+@PropertySource("classpath:security.properties")
 public class LightAdminSecurityConfiguration {
 
     private static final String REMEMBER_ME_DIGEST_KEY = "LightAdmin";
@@ -98,12 +110,20 @@ public class LightAdminSecurityConfiguration {
             "/dynamic/logo"
     };
 
-    @Value("classpath:users.properties")
-    private Resource usersResource;
-
     @Autowired
     private LightAdminConfiguration lightAdminConfiguration;
 
+    @Autowired
+    private DataSource dataSource;
+
+    private @Value("${usersByUsernameQuery}") String usersByUsernameQuery;
+    private @Value("${authoritiesByUsernameQuery}") String authoritiesByUsernameQuery;
+    private @Value("${useridBySFZQuery}") String useridBySFZQuery;
+
+    @Bean
+    public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
+        return new PropertySourcesPlaceholderConfigurer();
+    }
     @Bean
     @Autowired
     public FilterChainProxy springSecurityFilterChain(Filter filterSecurityInterceptor, Filter authenticationFilter, Filter rememberMeAuthenticationFilter, Filter logoutFilter, Filter exceptionTranslationFilter, Filter securityContextPersistenceFilter) {
@@ -195,17 +215,26 @@ public class LightAdminSecurityConfiguration {
     @Autowired
     public AuthenticationProvider authenticationProvider(UserDetailsService usersService) throws Exception {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setPasswordEncoder(new ShaPasswordEncoder());
+        provider.setPasswordEncoder(new Md5PasswordEncoder());
         provider.setUserDetailsService(usersService);
         provider.afterPropertiesSet();
         return provider;
     }
 
+    /**
+     * 用户详细信息service
+     * @return
+     */
     @Bean
     @Primary
-    public UserDetailsService userDetailsService() throws IOException {
-        Properties usersPproperties = PropertiesLoaderUtils.loadProperties(usersResource);
-        return new InMemoryUserDetailsManager(usersPproperties);
+    @Autowired
+    public UserDetailsService userDetailsService() {
+        RdbmsUserDetailsServiceImpl userDetailsService = new RdbmsUserDetailsServiceImpl();
+        userDetailsService.setDataSource(dataSource);
+        userDetailsService.setUsersByUsernameQuery(usersByUsernameQuery);
+        userDetailsService.setAuthoritiesByUsernameQuery(authoritiesByUsernameQuery);
+        userDetailsService.setUseridBySFZQuery(useridBySFZQuery);
+        return userDetailsService;
     }
 
     @Bean

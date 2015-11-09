@@ -38,7 +38,7 @@
     <table cellpadding="0" cellspacing="0" border="0" class="display" id="listViewTable">
         <thead>
         <tr>
-            <th class="info"></th>
+            <th class="info"><input type="checkbox" title="全选" id="" /></th>
             <c:forEach var="field" items="${fields}">
                 <th class="header"><c:out value="${field.name}"/></th>
             </c:forEach>
@@ -63,8 +63,12 @@
                     "aTargets": [ 0 ],
                     "mData": null,
                     "sClass": "center",
-                    "mRender": function () {
-                        return '<img class="quickView" src="<light:url value='/images/aNormal.png'/>" style="cursor:pointer;" title="${click_quick}"/>';
+                    "mRender": function (data, type, full) {
+                        var domainEntity = new DomainEntity(full);
+                        var primaryKeyProperty = ConfigurationMetadataService.getPrimaryKeyProperty(ApplicationConfig.RESOURCE_NAME);
+                        var entityId = domainEntity.getPropertyValue(primaryKeyProperty, 'listView');
+                        return '<input type="checkbox" class="list-row-checkbox" value="'+entityId+'"/>';
+                        //return '<img class="quickView" src="<light:url value='/images/aNormal.png'/>" style="cursor:pointer;" title="${click_quick}"/>';
                     }
                 },
             <c:forEach var="field" items="${fields}" varStatus="status">
