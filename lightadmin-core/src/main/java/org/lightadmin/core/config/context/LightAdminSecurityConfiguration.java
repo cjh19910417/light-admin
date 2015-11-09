@@ -137,6 +137,12 @@ public class LightAdminSecurityConfiguration {
         return new FilterChainProxy(filterChains);
     }
 
+    /**
+     * 拦截器??
+     * @param authenticationManager
+     * @return
+     * @throws Exception
+     */
     @Bean
     @Autowired
     public Filter filterSecurityInterceptor(AuthenticationManager authenticationManager) throws Exception {
@@ -148,12 +154,22 @@ public class LightAdminSecurityConfiguration {
         return filter;
     }
 
+    /**
+     * 保护的资源
+     * @return
+     */
     private FilterInvocationSecurityMetadataSource securityMetadataSource() {
         LinkedHashMap<RequestMatcher, Collection<ConfigAttribute>> map = newLinkedHashMap();
         map.put(AnyRequestMatcher.INSTANCE, asList((ConfigAttribute) new SecurityConfig(ROLE_ADMIN)));
         return new DefaultFilterInvocationSecurityMetadataSource(map);
     }
 
+    /**
+     * 用户认证Filter
+     * @param authenticationManager
+     * @param requestCache
+     * @return
+     */
     @Bean
     @Autowired
     public Filter authenticationFilter(AuthenticationManager authenticationManager, RequestCache requestCache) {
@@ -167,6 +183,11 @@ public class LightAdminSecurityConfiguration {
         return authenticationFilter;
     }
 
+    /**
+     * 认证异常过滤器
+     * @param requestCache
+     * @return
+     */
     @Bean
     public Filter exceptionTranslationFilter(RequestCache requestCache) {
         AccessDeniedHandlerImpl accessDeniedHandler = new AccessDeniedHandlerImpl();
@@ -177,6 +198,10 @@ public class LightAdminSecurityConfiguration {
         return exceptionTranslationFilter;
     }
 
+    /**
+     * 登出过滤器
+     * @return
+     */
     @Bean
     public Filter logoutFilter() {
         SecurityContextLogoutHandler logoutHandler = new SecurityContextLogoutHandler();
@@ -186,6 +211,10 @@ public class LightAdminSecurityConfiguration {
         return logoutFilter;
     }
 
+    /**
+     * SecurityContext持久化过滤器?为何需要持久化?
+     * @return
+     */
     @Bean
     public Filter securityContextPersistenceFilter() {
         HttpSessionSecurityContextRepository repo = new HttpSessionSecurityContextRepository();
@@ -193,6 +222,12 @@ public class LightAdminSecurityConfiguration {
         return new SecurityContextPersistenceFilter(repo);
     }
 
+    /**
+     * "记住我"认证过滤器
+     * @param authenticationManager
+     * @param userDetailsService
+     * @return
+     */
     @Bean
     public Filter rememberMeAuthenticationFilter(AuthenticationManager authenticationManager, UserDetailsService userDetailsService) {
         TokenBasedRememberMeServices rememberMeServices = new TokenBasedRememberMeServices(REMEMBER_ME_DIGEST_KEY, userDetailsService);
@@ -200,17 +235,33 @@ public class LightAdminSecurityConfiguration {
         return new RememberMeAuthenticationFilter(authenticationManager, rememberMeServices);
     }
 
+    /**
+     * 请求缓存??
+     * @return
+     */
     @Bean
     public RequestCache requestCache() {
         return new LightAdminRequestCache();
     }
 
+    /**
+     * 用户认证管理者,可提供多个认证服务
+     * @param authenticationProvider
+     * @param rememberMeAuthenticationProvider
+     * @return
+     */
     @Bean
     @Autowired
     public AuthenticationManager authenticationManager(AuthenticationProvider authenticationProvider, AuthenticationProvider rememberMeAuthenticationProvider) {
         return new ProviderManager(asList(authenticationProvider, rememberMeAuthenticationProvider));
     }
 
+    /**
+     * 普通的用户认证器,从userDetailService中获取待认证用户信息,再通过设置的加密算法和提交的认证密码做校验
+     * @param usersService
+     * @return
+     * @throws Exception
+     */
     @Bean
     @Autowired
     public AuthenticationProvider authenticationProvider(UserDetailsService usersService) throws Exception {
@@ -234,9 +285,14 @@ public class LightAdminSecurityConfiguration {
         userDetailsService.setUsersByUsernameQuery(usersByUsernameQuery);
         userDetailsService.setAuthoritiesByUsernameQuery(authoritiesByUsernameQuery);
         userDetailsService.setUseridBySFZQuery(useridBySFZQuery);
+        userDetailsService.setRolePrefix("ROLE_");
         return userDetailsService;
     }
 
+    /**
+     * 只需要校验"记住我"的cookie信息,所以需要提供remember_me_digest_key
+     * @return
+     */
     @Bean
     public AuthenticationProvider rememberMeAuthenticationProvider() {
         return new RememberMeAuthenticationProvider(REMEMBER_ME_DIGEST_KEY);

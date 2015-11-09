@@ -16,6 +16,7 @@
 package org.lightadmin.core.view;
 
 import org.apache.tiles.TilesContainer;
+import org.apache.tiles.access.TilesAccess;
 import org.apache.tiles.definition.DefinitionsFactory;
 import org.apache.tiles.definition.DefinitionsReader;
 import org.apache.tiles.definition.dao.BaseLocaleUrlDefinitionDAO;
@@ -52,7 +53,7 @@ public class LightAdminSpringTilesInitializer extends AbstractTilesInitializer {
 
     private static final boolean tilesElPresent = ClassUtils.isPresent("org.apache.tiles.el.ELAttributeEvaluator", LightAdminSpringTilesInitializer.class.getClassLoader());
 
-    public static final String LIGHT_ADMIN_TILES_CONTAINER_ATTRIBUTE = "org.apache.tiles.CONTAINER.LightAdmin";
+    //public static final String LIGHT_ADMIN_TILES_CONTAINER_ATTRIBUTE = "org.apache.tiles.CONTAINER.LightAdmin";
 
     private String[] definitions;
 
@@ -65,7 +66,7 @@ public class LightAdminSpringTilesInitializer extends AbstractTilesInitializer {
 
     @Override
     protected String getContainerKey(ApplicationContext applicationContext) {
-        return LIGHT_ADMIN_TILES_CONTAINER_ATTRIBUTE;
+        return TilesAccess.CONTAINER_ATTRIBUTE;
     }
 
     @Override

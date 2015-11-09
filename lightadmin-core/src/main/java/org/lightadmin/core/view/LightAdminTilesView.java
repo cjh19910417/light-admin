@@ -23,7 +23,6 @@ import org.apache.tiles.request.render.Renderer;
 import org.apache.tiles.request.servlet.ServletUtil;
 import org.springframework.web.servlet.view.tiles3.TilesView;
 
-import static org.lightadmin.core.view.LightAdminSpringTilesInitializer.LIGHT_ADMIN_TILES_CONTAINER_ATTRIBUTE;
 import static org.springframework.beans.PropertyAccessorFactory.forDirectFieldAccess;
 
 public class LightAdminTilesView extends TilesView {
@@ -34,7 +33,7 @@ public class LightAdminTilesView extends TilesView {
         setApplicationContext(applicationContext);
 
         if (getRenderer() == null) {
-            TilesContainer container = TilesAccess.getContainer(applicationContext, LIGHT_ADMIN_TILES_CONTAINER_ATTRIBUTE);
+            TilesContainer container = TilesAccess.getContainer(applicationContext);
             Renderer renderer = new DefinitionRenderer(container);
             setRenderer(renderer);
         }

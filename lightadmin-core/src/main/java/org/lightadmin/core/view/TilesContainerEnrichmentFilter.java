@@ -27,7 +27,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-import static org.lightadmin.core.view.LightAdminSpringTilesInitializer.LIGHT_ADMIN_TILES_CONTAINER_ATTRIBUTE;
 
 /**
  * Tiles容器增强过滤器
@@ -36,7 +35,7 @@ public class TilesContainerEnrichmentFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(final HttpServletRequest request, final HttpServletResponse response, final FilterChain filterChain) throws ServletException, IOException {
         ApplicationContext applicationContext = ServletUtil.getApplicationContext(getServletContext());
-        TilesContainer container = TilesAccess.getContainer(applicationContext, LIGHT_ADMIN_TILES_CONTAINER_ATTRIBUTE);
+        TilesContainer container = TilesAccess.getContainer(applicationContext);
 
         request.setAttribute(TilesAccess.CURRENT_CONTAINER_ATTRIBUTE_NAME, container);
 
