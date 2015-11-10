@@ -16,7 +16,9 @@
 package org.lightadmin.core.config.context;
 
 import org.lightadmin.core.config.LightAdminConfiguration;
+import org.lightadmin.core.config.security.RdbmsFilterInvocationDefinitionSource;
 import org.lightadmin.core.config.security.RdbmsUserDetailsServiceImpl;
+import org.lightadmin.core.config.util.DigestPasswordEncoder;
 import org.lightadmin.core.web.security.LightAdminRequestCache;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -78,11 +80,9 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 
 import javax.servlet.Filter;
 import javax.sql.DataSource;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Properties;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newLinkedHashMap;
@@ -138,7 +138,7 @@ public class LightAdminSecurityConfiguration {
     }
 
     /**
-     * 拦截器??
+     * 资源访问权限安全拦截器
      * @param authenticationManager
      * @return
      * @throws Exception
@@ -159,6 +159,9 @@ public class LightAdminSecurityConfiguration {
      * @return
      */
     private FilterInvocationSecurityMetadataSource securityMetadataSource() {
+        RdbmsFilterInvocationDefinitionSource rdbmsFilterInvocationDefinitionSource = new RdbmsFilterInvocationDefinitionSource();
+        rdbmsFilterInvocationDefinitionSource.setDataSource(dataSource);
+        //rdbmsFilterInvocationDefinitionSource.setActionPathParser();
         LinkedHashMap<RequestMatcher, Collection<ConfigAttribute>> map = newLinkedHashMap();
         map.put(AnyRequestMatcher.INSTANCE, asList((ConfigAttribute) new SecurityConfig(ROLE_ADMIN)));
         return new DefaultFilterInvocationSecurityMetadataSource(map);
@@ -266,7 +269,7 @@ public class LightAdminSecurityConfiguration {
     @Autowired
     public AuthenticationProvider authenticationProvider(UserDetailsService usersService) throws Exception {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setPasswordEncoder(new Md5PasswordEncoder());
+        provider.setPasswordEncoder(new DigestPasswordEncoder());//设置密码加密算法
         provider.setUserDetailsService(usersService);
         provider.afterPropertiesSet();
         return provider;
