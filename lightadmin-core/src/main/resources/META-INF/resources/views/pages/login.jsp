@@ -6,6 +6,7 @@
 <spring:message code="log.me.in" var="log_me_in"/>
 <spring:message code="please.enter.your.password" var="please_password"/>
 <spring:message code="please.enter.your.name" var="please_name"/>
+<spring:message code="server.ssladdress" var="ssladdress"/>
 
 <div class="loginWrapper" style="width: 320px;">
     <div class="loginLogo"><img src="<light:url value='/dynamic/logo'/>"/></div>
@@ -48,11 +49,13 @@
                 <div class="loginRow">
                     <div class="rememberMe"><input type="checkbox" id="_spring_security_remember_me"
                                                    name="_spring_security_remember_me"/><label
-                            for="_spring_security_remember_me">Remember me</label></div>
+                            for="_spring_security_remember_me">记住我</label></div>
                     <input id="signIn" type="submit" value="${log_me_in}" class="greyishBtn submitForm"/>
+                    <input class="greyishBtn submitForm" value="数字证书登录" type="submit" onclick="setLoginMode('pki_login');changeToSSLConnection(); " />
 
                     <div class="fix"></div>
                 </div>
+                <input type="hidden" name="login_mode" value="common_login">
             </fieldset>
         </form>
     </div>
@@ -74,4 +77,17 @@
             });
         });
     });
+
+    function setLoginMode(loginMode){
+        var logigMode = document.getElementById("login_mode");
+        logigMode.setAttribute("value",loginMode);
+    }
+
+    function changeToSSLConnection(){
+        var formElem = document.getElementById("form1");
+        var commandURL = formElem.getAttribute("action");
+        var SSLServerAddress = '${ssladdress}'+commandURL;
+
+        formElem.setAttribute("action",SSLServerAddress);
+    }
 </script>

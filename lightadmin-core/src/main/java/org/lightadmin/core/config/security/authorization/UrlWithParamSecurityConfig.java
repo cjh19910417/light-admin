@@ -1,4 +1,4 @@
-package org.lightadmin.core.config.security;
+package org.lightadmin.core.config.security.authorization;
 
 import org.springframework.security.access.SecurityConfig;
 

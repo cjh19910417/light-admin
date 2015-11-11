@@ -1,4 +1,4 @@
-package org.lightadmin.core.config.security;
+package org.lightadmin.core.config.security.authentication;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -10,13 +10,12 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.authority.GrantedAuthorityImpl;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.jdbc.JdbcDaoImpl;
 
-public class RdbmsUserDetailsServiceImpl extends JdbcDaoImpl{
-
-    private static final Log logger = LogFactory.getLog(RdbmsUserDetailsServiceImpl.class);
+public class RdbmsUserDetailsServiceImpl extends JdbcDaoImpl implements ExtendUserDetailsService{
+	
+	private static final Log logger = LogFactory.getLog(RdbmsUserDetailsServiceImpl.class);
 	
 	private String useridBySFZQuery;
 	
@@ -32,7 +31,7 @@ public class RdbmsUserDetailsServiceImpl extends JdbcDaoImpl{
                 String jh = rs.getString(7);
                 String workdept = rs.getString(8);
                 String zjhm = rs.getString(9);
-                String isDigitalCertificateSigned = rs.getString("SYS_RESERVER19");//是否已签发数字证书
+                String isDigitalCertificateSigned = rs.getString("SYS_RESERVER19");//�Ƿ���ǩ������֤��
 
                 AuthenticatedUser user = new AuthenticatedUser(username, password,dept,sys_reserver3, userRealName,
                 		jh,getCodeWithoutZero(dept, 2, "00") + "%",workdept,getCodeWithoutZero(workdept, 2, "00") + "%"  ,zjhm,enabled, true, true, true, AuthorityUtils.NO_AUTHORITIES,
@@ -59,12 +58,12 @@ public class RdbmsUserDetailsServiceImpl extends JdbcDaoImpl{
             public GrantedAuthority mapRow(ResultSet rs, int rowNum) throws SQLException {
                 String roleName = rs.getString(2);
                 if(roleName==null){
-                	logger.error("认证时发现 "+username+" 所对应的角色中有角色名为空的数据");
+                	logger.error("��֤ʱ���� "+username+" ���Ӧ�Ľ�ɫ���н�ɫ��Ϊ�յ����");
                 	return null;
-                	//throw new SecurityException("认证时发现 "+username+" 所对应的角色中有角色名为空的数据",SecurityException.authenticationErrorCode);
+                	//throw new SecurityException("��֤ʱ���� "+username+" ���Ӧ�Ľ�ɫ���н�ɫ��Ϊ�յ����",SecurityException.authenticationErrorCode);
                 }
                 roleName = getRolePrefix() + roleName.trim();
-                SimpleGrantedAuthority authority = new SimpleGrantedAuthority(roleName);
+                GrantedAuthorityImpl authority = new GrantedAuthorityImpl(roleName);
 
                 return authority;
             }
@@ -96,13 +95,13 @@ public class RdbmsUserDetailsServiceImpl extends JdbcDaoImpl{
 	
 	
 	/**
-	 * 用于截取字符串。 <br>
-	 * 例如截取部门编号： 442012100000。 以2个00为截取，以此达到获取上级部门的编号。
+	 * ���ڽ�ȡ�ַ� <br>
+	 * �����ȡ���ű�ţ� 442012100000�� ��2��00Ϊ��ȡ���Դ˴ﵽ��ȡ�ϼ����ŵı�š�
 	 * @description
-	 * @param code 被截取的对象。 例如部门编码、工作部门编码之类的。
-	 * @param cutSize 截取的长度
-	 * @param cutWhat 截取的东西。 例如截取部门编码中的00.
-	 * @return 返回截取好的字符串。 
+	 * @param code ����ȡ�Ķ��� ���粿�ű��롢�������ű���֮��ġ�
+	 * @param cutSize ��ȡ�ĳ���
+	 * @param cutWhat ��ȡ�Ķ����� �����ȡ���ű����е�00.
+	 * @return ���ؽ�ȡ�õ��ַ� 
 	 */
 	private String getCodeWithoutZero(String code, int cutSize, String cutWhat) {
 		

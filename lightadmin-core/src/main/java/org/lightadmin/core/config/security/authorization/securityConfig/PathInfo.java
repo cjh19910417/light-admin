@@ -1,4 +1,4 @@
-package org.lightadmin.core.config.security;
+package org.lightadmin.core.config.security.authorization.securityConfig;
 
 public class PathInfo {
 	private String url;
