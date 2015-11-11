@@ -158,7 +158,8 @@ public class LightAdminSecurityConfiguration {
 	public Filter filterSecurityInterceptor(AuthenticationManager authenticationManager) throws Exception {
 		FilterSecurityInterceptor filter = new FilterSecurityInterceptor();
 		filter.setAuthenticationManager(authenticationManager);
-		filter.setAccessDecisionManager(new AffirmativeBased(asList((AccessDecisionVoter) new RoleVoter())));
+		//filter.setAccessDecisionManager(new AffirmativeBased(asList((AccessDecisionVoter) new RoleVoter())));
+		filter.setAccessDecisionManager(accessDesisionManager());
 		filter.setSecurityMetadataSource(rdbmsFilterInvocationDefinitionSource());
 		filter.afterPropertiesSet();
 		return filter;
@@ -258,7 +259,7 @@ public class LightAdminSecurityConfiguration {
 		Map<String, AuthenticationInfoExtractor> extractors = newHashMap();
 		extractors.put("pki_login", x509AuthenticationInfoExtractor());//x.509证书登录
 		extractors.put("common_login", commonAuthenticationInfoExtractor());//普通的form表单登录
-		return null;
+		return extractors;
 	}
 
 	/**
