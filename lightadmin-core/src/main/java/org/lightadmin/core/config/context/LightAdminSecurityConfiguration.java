@@ -27,9 +27,8 @@ import org.lightadmin.core.config.security.authentication.x509auth.SSLAuthentica
 import org.lightadmin.core.config.security.authentication.x509auth.X509AuthenticationInfoExtractor;
 import org.lightadmin.core.config.security.authorization.ActionPathParser;
 import org.lightadmin.core.config.security.authorization.FilterInvocationWithPatternMetadataSource;
-import org.lightadmin.core.config.security.authorization.actionpathparser.LocalizationActionPathParser;
 import org.lightadmin.core.config.security.authorization.securityConfig.DefinitionSourceCache;
-import org.lightadmin.core.config.security.authorization.securityConfig.EhCacheFilterInvocationSecurityMetadataSourceImpl;
+import org.lightadmin.core.config.security.authorization.securityConfig.RedisCacheFilterInvocationSecurityMetadataSource;
 import org.lightadmin.core.config.security.authorization.securityConfig.RdbmsFilterInvocationDefinitionSource;
 import org.lightadmin.core.config.security.authorization.vote.PermitAllVoter;
 import org.lightadmin.core.web.security.LightAdminRequestCache;
@@ -41,8 +40,6 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.security.access.AccessDecisionVoter;
-import org.springframework.security.access.ConfigAttribute;
-import org.springframework.security.access.SecurityConfig;
 import org.springframework.security.access.vote.AffirmativeBased;
 import org.springframework.security.access.vote.RoleVoter;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -59,7 +56,6 @@ import org.springframework.security.web.FilterChainProxy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandlerImpl;
 import org.springframework.security.web.access.ExceptionTranslationFilter;
-import org.springframework.security.web.access.intercept.DefaultFilterInvocationSecurityMetadataSource;
 import org.springframework.security.web.access.intercept.FilterInvocationSecurityMetadataSource;
 import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
@@ -75,12 +71,9 @@ import org.springframework.security.web.context.SecurityContextPersistenceFilter
 import org.springframework.security.web.savedrequest.RequestCache;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.AnyRequestMatcher;
-import org.springframework.security.web.util.matcher.RequestMatcher;
 
 import javax.servlet.Filter;
 import javax.sql.DataSource;
-import java.util.Collection;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -99,7 +92,6 @@ import static java.util.Arrays.asList;
 public class LightAdminSecurityConfiguration {
 
 	private static final String REMEMBER_ME_DIGEST_KEY = "LightAdmin";
-	private static final String ROLE_ADMIN = "ROLE_ADMIN";
 
 	/**
 	 * 公共类资源url pattern，无需认证
@@ -110,6 +102,7 @@ public class LightAdminSecurityConfiguration {
 			"/login", "/page-not-found", "/access-denied",
 			"/dynamic/logo"
 	};
+	public static final String ROLE_PREFIX = "ROLE_";
 
 	@Autowired
 	private LightAdminConfiguration lightAdminConfiguration;
@@ -181,7 +174,7 @@ public class LightAdminSecurityConfiguration {
 	 * @return
 	 */
 	public FilterInvocationSecurityMetadataSource cachingFilterInvocationSecurityMetadataSource(){
-		EhCacheFilterInvocationSecurityMetadataSourceImpl cacheFilterInvocationSecurityMetadataSource = new EhCacheFilterInvocationSecurityMetadataSourceImpl();
+		RedisCacheFilterInvocationSecurityMetadataSource cacheFilterInvocationSecurityMetadataSource = new RedisCacheFilterInvocationSecurityMetadataSource();
 		cacheFilterInvocationSecurityMetadataSource.setActionPathParser(actionPathParser());
 		cacheFilterInvocationSecurityMetadataSource.setCache(cachingDefinitionSourceCache());
 		cacheFilterInvocationSecurityMetadataSource.setDelegate((FilterInvocationWithPatternMetadataSource) rdbmsFilterInvocationDefinitionSource());
@@ -210,17 +203,17 @@ public class LightAdminSecurityConfiguration {
 		//资源路径解析器
 		rdbmsFilterInvocationDefinitionSource.setActionPathParser(actionPathParser());
 		//角色前缀
-		rdbmsFilterInvocationDefinitionSource.setRolePrefix("ROLE_");
+		rdbmsFilterInvocationDefinitionSource.setRolePrefix(ROLE_PREFIX);
 
 		rdbmsFilterInvocationDefinitionSource.setDefinitionSourceByUrlQuery(definitionSourceByUrlQuery);
 
 		rdbmsFilterInvocationDefinitionSource.setDefinitionSourceByMatchingUrlQuery(definitionSourceByMatchingUrlQuery);
 
 		rdbmsFilterInvocationDefinitionSource.setDefinitionSourcePermitToAllQuery(definitionSourcePermitToAllQuery);
-
+/*
 		LinkedHashMap<RequestMatcher, Collection<ConfigAttribute>> map = newLinkedHashMap();
-		map.put(AnyRequestMatcher.INSTANCE, asList((ConfigAttribute) new SecurityConfig(ROLE_ADMIN)));
-		return new DefaultFilterInvocationSecurityMetadataSource(map);
+		map.put(AnyRequestMatcher.INSTANCE, asList((ConfigAttribute) new SecurityConfig(ROLE_ADMIN)));*/
+		return rdbmsFilterInvocationDefinitionSource;
 	}
 
 	private ActionPathParser actionPathParser() {
@@ -230,6 +223,8 @@ public class LightAdminSecurityConfiguration {
 
 	//################################权限设置end################################
 
+
+	//###########################用户登录认证设置start############################
 
 	/**
 	 * 用户认证Filter
@@ -396,7 +391,7 @@ public class LightAdminSecurityConfiguration {
 		userDetailsService.setUsersByUsernameQuery(usersByUsernameQuery);
 		userDetailsService.setAuthoritiesByUsernameQuery(authoritiesByUsernameQuery);
 		userDetailsService.setUseridBySFZQuery(useridBySFZQuery);
-		userDetailsService.setRolePrefix("ROLE_");
+		userDetailsService.setRolePrefix(ROLE_PREFIX);
 		return userDetailsService;
 	}
 
@@ -408,6 +403,9 @@ public class LightAdminSecurityConfiguration {
 	public AuthenticationProvider rememberMeAuthenticationProvider() {
 		return new RememberMeAuthenticationProvider(REMEMBER_ME_DIGEST_KEY);
 	}
+
+	//###########################用户登录认证设置end############################
+
 
 	private String applicationUrl(String path) {
 		return lightAdminConfiguration.getApplicationUrl(path);

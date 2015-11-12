@@ -9,17 +9,18 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.lightadmin.core.config.security.authorization.ActionPathParser;
 import org.lightadmin.core.config.security.authorization.FilterInvocationWithPatternMetadataSource;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.access.ConfigAttribute;
 import org.springframework.security.web.FilterInvocation;
 import org.springframework.security.web.access.intercept.FilterInvocationSecurityMetadataSource;
 import org.springframework.util.Assert;
 
 
-public class EhCacheFilterInvocationSecurityMetadataSourceImpl implements
-		FilterInvocationSecurityMetadataSource {
+public class RedisCacheFilterInvocationSecurityMetadataSource implements FilterInvocationSecurityMetadataSource {
 
 	private final Log logger = LogFactory.getLog(this.getClass());
 	//private PathMatcher pathMatcher = new AntPathMatcher();
+	private RedisTemplate redisTemplate;
 
 	private FilterInvocationWithPatternMetadataSource delegate;
 	private DefinitionSourceCache cache;
@@ -116,5 +117,6 @@ public class EhCacheFilterInvocationSecurityMetadataSourceImpl implements
 	public void setActionPathParser(ActionPathParser actionPathParser) {
 		this.actionPathParser = actionPathParser;
 	}
+
 
 }

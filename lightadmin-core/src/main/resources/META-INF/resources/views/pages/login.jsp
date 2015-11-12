@@ -51,11 +51,11 @@
                                                    name="_spring_security_remember_me"/><label
                             for="_spring_security_remember_me">记住我</label></div>
                     <input id="signIn" type="submit" value="${log_me_in}" class="greyishBtn submitForm"/>
-                    <input class="greyishBtn submitForm" value="数字证书登录" type="submit" onclick="setLoginMode('pki_login');changeToSSLConnection(); " />
+                    <input class="greyishBtn submitForm" value="数字证书登录" type="submit" onclick="changeToSSLConnection();" />
 
                     <div class="fix"></div>
                 </div>
-                <input type="hidden" name="login_mode" value="common_login">
+                <input type="hidden" id="login_mode" name="login_mode" value="common_login">
             </fieldset>
         </form>
     </div>
@@ -84,10 +84,12 @@
     }
 
     function changeToSSLConnection(){
-        var formElem = document.getElementById("form1");
+        setLoginMode('pki_login');
+        var formElem = document.getElementById("login-form");
         var commandURL = formElem.getAttribute("action");
         var SSLServerAddress = '${ssladdress}'+commandURL;
 
         formElem.setAttribute("action",SSLServerAddress);
+        alert(SSLServerAddress);
     }
 </script>
